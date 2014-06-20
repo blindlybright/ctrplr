@@ -1,0 +1,18 @@
+.css-reloader {
+	position:absolute;
+	top:0;
+	right:0;
+	background:#800;
+	color:#fff;
+	width:30px;
+	font:12px/16px arial, sans-serif;
+	padding:7px 0;
+	text-align:center;
+	z-index:3000;
+	text-decoration:none;
+	color:#eee;
+}
+.css-reloader:hover {
+	color:#fff;
+	background:#c00;
+}
