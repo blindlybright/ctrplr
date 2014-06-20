@@ -1,11 +1,12 @@
 // ==UserScript==
-// @name       CSS Reloader
-// @namespace  http://stylesheats.reloader.caterpillar/
-// @version    0.1
+// @author       caterpillar
+// @name         CSS Reloader
+// @namespace    http://stylesheats.reloader.caterpillar/
+// @version      0.1
 // @description  stylesheats reloader
-// @include    /^https?://ctrplr\.caterpillar.*/
-// @include    /^https?://192\.168\..*$/
-// @copyright  2014+, You
+// @include      /^https?://ctrplr\.caterpillar.*/
+// @include      /^https?://192\.168\..*$/
+// @copyright    2014+, caterpillar
 // ==/UserScript==
 
 !function(window, undefined){
