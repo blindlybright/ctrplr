@@ -1,18 +1,93 @@
-.css-reloader {
-	position:absolute;
+/*
+ * css reloader
+ ****************/
+.top-panel {
+	position:fixed;
+	z-index:3001;
 	top:0;
 	right:0;
-	background:#800;
-	color:#fff;
+	padding:5px 0 5px 5px;
+	background:#fff;
+	color:#000;
+	opacity:.5;
+	-webkit-transition:all .5s ease;
+	transition:all .5s ease;
+	width:30px;
+	height:6px;
+	-webkit-box-sizing:content-box;
+	box-sizing:content-box;
+	-webkit-box-shadow:0 0 2px #000;
+	box-shadow:0 0 2px #000;
+	}
+	.top-panel:hover {
+		opacity:1;
+		right:40px;
+		}
+	.top-panel a {
+		color:#ccc;
+		text-decoration:none;
+		}
+.top-panel__header {
+	display:inline-block;
+	*display:inline;
+	*zoom:1;
+	vertical-align:top;
+	background:#fff;
+	line-height:6px;
+	font-size:10px;
+	}
+.top-panel__content {
+	position:absolute;
+	z-index:3000;
+	top:0;
+	right:-40px;
+	width:30px;
+	background:#fff;
+	padding:5px;
+	-webkit-box-sizing:content-box;
+	box-sizing:content-box;
+	}
+	.top-panel__content:before {
+		content:" ";
+		position:absolute;
+		top:0;
+		left:-3px;
+		width:3px;
+		height:16px;
+		background:#fff;
+		}
+.top-panel:hover .top-panel__content {
+	box-shadow:0 0 2px #000;
+	}
+.control {
+	display:inline-block;
+	*display:inline;
+	*zoom:1;
 	width:30px;
 	font:12px/16px arial, sans-serif;
 	padding:7px 0;
 	text-align:center;
-	z-index:3000;
-	text-decoration:none;
 	color:#eee;
-}
-.css-reloader:hover {
+	margin:0 5px 0 0;
+	-webkit-transition:all .25s ease;
+	}
+.css-style {
+	background:#080;
 	color:#fff;
-	background:#c00;
-}
+	}
+	.css-style:hover {
+		color:#fff;
+		background:#0c0;
+		}
+.js-style {
+	background:#800;
+	color:#fff;
+	}
+	.js-style:hover {
+		color:#fff;
+		background:#c00;
+		}
+
+
+
+
