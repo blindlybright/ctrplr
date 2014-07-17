@@ -7,4 +7,8 @@
 3. **change** @include notations, describes when to run this script.
 4. **note** userscript.user.js, line 16:    
    ```// urls must be a set of regexps, duplicating @include notations in ==Userscript== section above```
-5. **profit!!!** ^__~
+5. **refresh** your target page (note sign "ЦУП" in top right corner);
+6. **profit!!!** ^__~
+
+CSS Refresher was created while working with heavy projects by their server side.
+Script is reducing server load with refreshing only stylesheets.
