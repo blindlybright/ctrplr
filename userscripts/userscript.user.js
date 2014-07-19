@@ -4,21 +4,20 @@
 // @version    0.1
 // @description  stylesheats reloader
 // @include    /^https?://.*$/
-// @include    /^https?://ctrplr\.caterpillar.*/
-// @include    /^https?://192\.168\..*$/
+// @include    /^https?://another\.host.*/
 // @copyright  2014+, caterpillar
 // ==/UserScript==
 
 (function(window, undefined){
-	var opts = {
-		name:"executing",
-		info:"CSS Reloader",
-		// urls must be a set of regexps, duplicating @include notations in ==Userscript== section above
-		urls:["^https?://.*$", "^https?://ctrplr\.caterpillar.*", "^https?://192\.168\..*$"],
-		jQueryUrl:'http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js',
-		scriptToLoad:'http://ctrplr.caterpillar/userscripts/css-reloader/default.js'
-		// scriptToLoad:'https://raw.githubusercontent.com/blindlybright/github.io/master/userscripts/css-reloader/default.js'
-	}, w, i, isAppended = false;
+	var protocol = window.location.protocol,
+		opts = {
+			name:"executing",
+			info:"CSS Reloader",
+			urls:["^https?://.*$", "^https?://another\.host.*"],  // urls must be a set of regexps, duplicating @include notations in ==Userscript== section above
+			jQueryUrl:protocol + '//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js',
+			scriptToLoad:protocol + '//ctrplr.caterpillar/userscripts/css-reloader/default.js'
+			// scriptToLoad:'https://raw.githubusercontent.com/blindlybright/github.io/master/userscripts/css-reloader/default.js'
+		}, w, i, isAppended = false;
 
 	if (window.unsafeWindow !== undefined) {
 		w = window.unsafeWindow;

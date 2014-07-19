@@ -2,17 +2,22 @@
 	function splitByFilename(str) {
 		var arr = str.split("/"),
 			filename = arr.pop(),
-			gets = filename.split("?");
+			gets = filename.split("?"),
+			getObj = {}, _get, i;
 
 		filename = gets[0];
-		gets = gets.length > 1 ? gets[1] : "";
-		gets = gets.split("&");
-		if (gets.length == 1) gets = [];
-
+		gets = gets.length > 1 ? gets[1] : undef;
+		if (gets !== undef) {
+			gets = gets.split("&");
+			for (i in gets) {
+				_get = gets[i].split("=");
+				getObj[_get[0]] = _get[1];
+			}
+		}
 		return {
 			path:arr.join("/")+"/",
 			filename:filename,
-			gets:gets
+			gets:getObj
 		};
 	}
 	function getStylesByPartOfPath(strmatch) {
@@ -45,21 +50,27 @@
 			rnd = (Math.random()+"").split(".")[1]*1;
 
 		console.groupCollapsed("--- css refreshing ---");
-		console.log("starting refreshing: " + $links.size() + " stylesheats, rnd = " + rnd);
+		console.log("starting refreshing: " + ($links.size()-1) + " stylesheats, rnd = " + rnd); // -1 is about css-reloader/default.css
 
 		$links.each(function(i){
 			var $t = $(this),
 				href = $t.attr("href"),
 				splitted = splitByFilename(href),
-				gets = splitted['gets'];
+				getsObj = splitted['gets'],
+				_gets = [],
+				i;
 
-			gets.push("rnd=" + rnd);
-			//console.log(gets);
-			gets = gets.join("&");
+			getsObj.rnd = rnd;
 
-			if (splitted['filename'] !== "application.css") {
+			for (i in getsObj) {
+				_gets.push(i + (getsObj[i] ? ("=" + getsObj[i]) : ""));
+			}
+			_gets = _gets.join("&");
+
+			// application.css is about rails projects in development mode
+			if ((widgetData.mode != "railsDevelopment" || splitted['filename'] !== "application.css") && splitted['path'].match(new RegExp(widgetData.name, "")) === null) {
 				console.log("stylesheet["+i+"]: ", splitted);
-				$t.attr("href", splitted['path'] + splitted['filename'] + (gets !== "" ? ("?" + gets) : ""));
+				$t.attr("href", splitted['path'] + splitted['filename'] + (_gets !== "" ? ("?" + _gets) : ""));
 			}
 		});
 		console.log("finished");
@@ -111,7 +122,6 @@
 
 			if ($a.size()) {
 				action = $a.data("action") || "noop";
-				//console.log(action, data, data.controls, data.controls[action]);
 				if (data.controls[action] && data.controls[action].clickFn) {
 					data.controls[action].clickFn.call($t);
 				}
@@ -120,6 +130,8 @@
 	}
 
 	var widgetData = {
+			mode:"railsDevelopment",     // "railsDevelopment" or something else
+			name:"css-reloader",
 			controls:{
 				/*blank:{
 					className:'blank',
@@ -146,8 +158,8 @@
 		$panel = buildWidget(widgetData);
 
 	bindWidget.apply($panel);
-
 	$panel.trigger("widget:init");
-	getStylesByPartOfPath("css-reloader");
+
+	getStylesByPartOfPath(widgetData.name);
 
 }(document, window, jQuery);
