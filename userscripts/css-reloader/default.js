@@ -68,7 +68,7 @@
 			_gets = _gets.join("&");
 
 			// application.css is about rails projects in development mode
-			if ((widgetData.mode != "railsDevelopment" || splitted['filename'] !== "application.css") && splitted['path'].match(new RegExp(widgetData.name, "")) === null) {
+			if ((widgetData.mode != "railsDev" || splitted['filename'] !== "application.css") && splitted['path'].match(new RegExp(widgetData.name, "")) === null) {
 				console.log("stylesheet["+i+"]: ", splitted);
 				$t.attr("href", splitted['path'] + splitted['filename'] + (_gets !== "" ? ("?" + _gets) : ""));
 			}
@@ -81,7 +81,7 @@
 			controls = data.controls || {},
 			i,
 			$panel = $("<div class='top-panel'></div>"),
-			html = ["<span class='top-panel__header'>ЦУП</span>"];
+			html = ["<span class='top-panel__header'>My pane</span>"];
 
 		html.push("<span class='top-panel__content'>");
 		for (var key in controls) {
@@ -106,6 +106,10 @@
 
 		$t.bind("widget:init", function(){
 			$t.prependTo("body");
+			setTimeout(function(){
+				$t.addClass("top-panel--initialized");
+			}, 100);
+			
 
 		}).bind("mouseenter mouseleave", function(e){
 			var $t = $(this);
@@ -130,7 +134,7 @@
 	}
 
 	var widgetData = {
-			mode:"railsDevelopment",     // "railsDevelopment" or something else
+			mode:"railsDev",     // "railsDev" or something else
 			name:"css-reloader",
 			controls:{
 				/*blank:{

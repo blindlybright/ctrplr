@@ -1,18 +1,16 @@
 /*
  * css reloader
+ * -webkit only prefixes
  ****************/
 .top-panel {
 	position:fixed;
 	z-index:3001;
 	top:0;
 	right:0;
-	padding:5px 0 5px 5px;
+	padding:5px;
 	background:#fff;
 	color:#000;
 	opacity:.5;
-	-webkit-transition:all .5s ease;
-	transition:all .5s ease;
-	width:30px;
 	height:6px;
 	-webkit-box-sizing:content-box;
 	box-sizing:content-box;
@@ -28,6 +26,10 @@
 		color:#ccc;
 		text-decoration:none;
 		}
+.top-panel.top-panel--initialized {
+	-webkit-transition:all .5s ease;
+	transition:all .5s ease;
+	}
 .top-panel__header {
 	display:inline-block;
 	*display:inline;
@@ -71,6 +73,7 @@
 	color:#eee;
 	margin:0 5px 0 0;
 	-webkit-transition:all .25s ease;
+	transition:all .25s ease;
 	}
 .css-style {
 	background:#080;
