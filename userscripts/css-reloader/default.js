@@ -109,8 +109,10 @@ function splitByFilename(str) {
 				i;
 			for(i = 0; i < combs.length; i++) {
 				if (this.checkForCombinationPressed(combs[i].string)) {
-					e.preventDefault();
-					e.stopPropagation();
+					if (e !== undefined) {
+						e.preventDefault();
+						e.stopPropagation();
+					}
 					combs[i].exec();
 				}
 			}
