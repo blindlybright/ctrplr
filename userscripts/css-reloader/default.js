@@ -38,7 +38,7 @@ function splitByFilename(str) {
 			$(window).bind("keydown", function(e){
 				//console.log(e.keyCode);
 				t.pushKey(e.keyCode);
-				t.checkForCombinationsPressed();
+				t.checkForCombinationsPressed(e);
 			}).bind("keyup", function(e){
 				t.popKey(e.keyCode);
 			});
@@ -104,11 +104,13 @@ function splitByFilename(str) {
 			//console.log("arr", arr, isPressed);
 			return isPressed;
 		},
-		checkForCombinationsPressed: function() {
+		checkForCombinationsPressed: function(e) {
 			var combs = this.combsListenTo,
 				i;
 			for(i = 0; i < combs.length; i++) {
 				if (this.checkForCombinationPressed(combs[i].string)) {
+					e.preventDefault();
+					e.stopPropagation();
 					combs[i].exec();
 				}
 			}
