@@ -1,7 +1,30 @@
 ;!function(document, window, $, undef){
+'use strict';
+function splitByFilename(str) {
+	var arr = str.split("/"),
+		filename = arr.pop(),
+		gets = filename.split("?"),
+		getObj = {}, _get, i;
+
+	filename = gets[0];
+	gets = gets.length > 1 ? gets[1] : undef;
+	if (gets !== undef) {
+		gets = gets.split("&");
+		for (i in gets) {
+			_get = gets[i].split("=");
+			getObj[_get[0]] = _get[1];
+		}
+	}
+	return {
+		path:arr.join("/")+"/",
+		filename:filename,
+		gets:getObj
+	};
+}
+
 /* KeyPresser {{{ */
 	var KeyPresser = function(combs) {
-		this.keyMap = {ENTER:13, SHIFT:16, CTRL:17, ALT:18, ESC:27};
+		this.keyMap = {ENTER:13, SHIFT:16, CTRL:17, ALT:18, ESC:27, LEFT:37, RIGHT:39, UP:38, DOWN:40};
 		this.keysPressed = [];
 		this.combsListenTo = combs || [];
 		this.init.call(this, arguments);
@@ -13,6 +36,7 @@
 		bind: function() {
 			var t = this;
 			$(window).bind("keydown", function(e){
+				//console.log(e.keyCode);
 				t.pushKey(e.keyCode);
 				t.checkForCombinationsPressed();
 			}).bind("keyup", function(e){
@@ -92,28 +116,7 @@
 	}
 /* }}} KeyPresser */
 
-	function splitByFilename(str) {
-		var arr = str.split("/"),
-			filename = arr.pop(),
-			gets = filename.split("?"),
-			getObj = {}, _get, i;
-
-		filename = gets[0];
-		gets = gets.length > 1 ? gets[1] : undef;
-		if (gets !== undef) {
-			gets = gets.split("&");
-			for (i in gets) {
-				_get = gets[i].split("=");
-				getObj[_get[0]] = _get[1];
-			}
-		}
-		return {
-			path:arr.join("/")+"/",
-			filename:filename,
-			gets:getObj
-		};
-	}
-
+/* Widget {{{ */
 	var Widget = function() {
 		this.init.apply(this, arguments);
 	}
@@ -181,10 +184,6 @@
 					//console.log(value.hotKey);
 				}
 			}
-			/* test any combination
-			this.keyPresser.registerCombination("L+R", function(){
-				console.log("alt shift r");
-			});*/
 
 			$t.bind("widget:init", function(){
 				$t.prependTo("body");
@@ -218,7 +217,8 @@
 			this.$panel.trigger("widget:init");
 		}
 	}
-/* end of common funcs */
+/* }}} Widget */
+/* end of common funcs & classes */
 
 
 	function execFnCR() {
@@ -285,12 +285,9 @@
 		},
 		panelWidget = new Widget(widgetData);
 
-	/*!function(){
-		var str = "Alt+Shift+R".toLowerCase(),
-			keyPresser = new KeyPresser(),
-			strKeys = keyPresser.stringToKeysArray(str);
-
-		console.log(strKeys);
-	}();*/
+	/* test for any combination event */
+	/*new KeyPresser().registerCombination("left+right", function(){
+		console.log("left + right");
+	});*/
 
 }(document, window, jQuery);
