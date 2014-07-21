@@ -1,4 +1,97 @@
 ;!function(document, window, $, undef){
+/* KeyPresser {{{ */
+	var KeyPresser = function(combs) {
+		this.keyMap = {ENTER:13, SHIFT:16, CTRL:17, ALT:18, ESC:27};
+		this.keysPressed = [];
+		this.combsListenTo = combs || [];
+		this.init.call(this, arguments);
+	}
+	KeyPresser.prototype = {
+		init: function() {
+			this.bind();
+		},
+		bind: function() {
+			var t = this;
+			$(window).bind("keydown", function(e){
+				t.pushKey(e.keyCode);
+				t.checkForCombinationsPressed();
+			}).bind("keyup", function(e){
+				t.popKey(e.keyCode);
+			});
+		},
+		pushKey: function(a) {
+			if (!this.isKeyPressed(a)) {
+				this.keysPressed.push(a);
+			}
+			//console.log(this.keysPressed);
+		},
+		popKey: function(a) {
+			var arr = this.keysPressed,
+				i, arrFine = [];
+			for(i = 0; i < arr.length; i++) {
+				if (a !== arr[i]) {
+					arrFine.push(arr[i]);
+				}
+			}
+			this.keysPressed = arrFine;
+			//console.log(this.keysPressed);
+		},
+		isKeyPressed: function(ch) {
+			var src = this.keysPressed,
+				l = src.length,
+				i;
+			for(i = 0; i < l; i++) {
+				if (src[i] == ch) {
+					return true;
+				}
+			}
+			return false;
+		},
+		registerCombination: function(string, callback) {
+			var comb = {
+					string: this.stringToKeysArray(string),
+					exec: callback
+				};
+			this.combsListenTo.push(comb);
+		},
+		stringToKeysArray: function(str) {
+			var keysMap = this.keyMap,
+				arr = str.toUpperCase().split("+"),
+				i,
+				arrNums = [];
+
+			for(i = 0; i < arr.length; i++) {
+				if (keysMap[arr[i]]!== undef) {
+					arrNums.push(keysMap[arr[i]]);
+				} else {
+					arrNums.push(arr[i].charCodeAt(0));
+				}
+			}
+			return arrNums;
+		},
+		checkForCombinationPressed: function(arr) {
+			var i,
+				isPressed = true;
+			for(i = 0; i < arr.length; i++) {
+				if (!this.isKeyPressed(arr[i])) {
+					isPressed = false;
+				}
+			}
+			//console.log("arr", arr, isPressed);
+			return isPressed;
+		},
+		checkForCombinationsPressed: function() {
+			var combs = this.combsListenTo,
+				i;
+			for(i = 0; i < combs.length; i++) {
+				if (this.checkForCombinationPressed(combs[i].string)) {
+					combs[i].exec();
+				}
+			}
+		}
+	}
+/* }}} KeyPresser */
+
 	function splitByFilename(str) {
 		var arr = str.split("/"),
 			filename = arr.pop(),
@@ -20,20 +113,114 @@
 			gets:getObj
 		};
 	}
-	function getStylesByPartOfPath(strmatch) {
-		var script = "",
-			splitted;
-		$("script").each(function(){
-			var $t = $(this),
-				src = $t.attr("src");
-			if (src && src.indexOf(strmatch) > -1) {
-				script = src;
-			}
-		});
-		splitted = splitByFilename(script);
 
-		$("head").append("<link href='" + splitted['path'] + "default.css' rel='stylesheet' type='text/css' />");
+	var Widget = function() {
+		this.init.apply(this, arguments);
 	}
+	Widget.prototype = {
+		init: function(widgetData) {
+			this.widgetData = widgetData || {};
+			this.widgetData.controls = widgetData.controls || {};
+			this.widgetData.name = widgetData.name || "noname";
+
+			this.getStylesByPartOfPath(widgetData.name);
+
+			this.buildWidget().bindWidget().startWidget();
+		},
+		getStylesByPartOfPath: function(strmatch) {
+			var script = "",
+				splitted;
+
+			$("script").each(function(){
+				var $t = $(this),
+					src = $t.attr("src");
+				if (src && src.indexOf(strmatch) > -1) {
+					script = src;
+				}
+			});
+			splitted = splitByFilename(script);
+
+			$("head").append("<link href='" + splitted['path'] + "default.css' rel='stylesheet' type='text/css' />");
+		},
+		buildWidget: function() {
+			var data = this.widgetData,
+				controls = data.controls || {},
+				key, value,
+				$panel = $("<div class='top-panel'></div>"),
+				html = ["<span class='top-panel__header'>My pane</span>"];
+
+			html.push("<span class='top-panel__content'>");
+			for (key in controls) {
+				if (key === 'length' || !controls.hasOwnProperty(key)) continue;
+				value = controls[key];
+				html.push("<a href='#" + key + "' class='" + value.className + "' title='" + value.titleHov + "' data-action='" + key + "'>" + value.title + "</a>");
+			}
+			html.push("</span>");
+
+			$(html.join("")).appendTo($panel);
+			$panel.data({
+				widgetData:data
+			});
+			this.$panel = $panel;
+			return this;
+		},
+		bindWidget: function() {
+			var $t = this.$panel,
+				key, value,
+				data = this.widgetData,
+				controls = data.controls;
+
+			this.keyPresser = new KeyPresser();
+
+			//console.log(controls);
+			for(key in controls) {
+				if (key === 'length' || !controls.hasOwnProperty(key)) continue;
+				value = controls[key];
+				if (value.hotKey !== undefined) {
+					this.keyPresser.registerCombination(value.hotKey, value.jobFn);
+					//console.log(value.hotKey);
+				}
+			}
+			/* test any combination
+			this.keyPresser.registerCombination("L+R", function(){
+				console.log("alt shift r");
+			});*/
+
+			$t.bind("widget:init", function(){
+				$t.prependTo("body");
+				setTimeout(function(){
+					$t.addClass("top-panel--initialized");
+				}, 100);
+
+			}).bind("mouseenter mouseleave", function(e){
+				var $t = $(this);
+				$t[e.type == "mouseenter" ? "addClass" : "removeClass"]("top-panel--hovered");
+
+			}).click(function(e){
+				e.stopPropagation();
+				e.preventDefault();
+
+				var $t = $(this),
+					$e = $(e.target),
+					$a = $e.closest("a"),
+					action;
+
+				if ($a.size()) {
+					action = $a.data("action") || "noop";
+					if (data.controls[action] && data.controls[action].jobFn) {
+						data.controls[action].jobFn.call($t);
+					}
+				}
+			});
+			return this;
+		},
+		startWidget: function() {
+			this.$panel.trigger("widget:init");
+		}
+	}
+/* end of common funcs */
+
+
 	function execFnCR() {
 		console.log("Do something with window.fnCR function");
 		if (window.fnCR !== undef) {
@@ -76,94 +263,34 @@
 		console.log("finished");
 		console.groupEnd();
 	}
-	function buildWidget(data) {
-		var data = data || {},
-			controls = data.controls || {},
-			i,
-			$panel = $("<div class='top-panel'></div>"),
-			html = ["<span class='top-panel__header'>My pane</span>"];
-
-		html.push("<span class='top-panel__content'>");
-		for (var key in controls) {
-			if (key === 'length' || !controls.hasOwnProperty(key)) continue;
-			var value = controls[key];
-			html.push("<a href='#" + key + "' class='" + value.className + "' title='" + value.titleHov + "' data-action='" + key + "'>" + value.title + "</a>");
-		}
-		html.push("</span>");
-
-		$(html.join("")).appendTo($panel);
-		$panel.data({
-			widgetData:data
-		});
-
-		return $panel;
-	}
-	function bindWidget() {
-		var $t = $(this),
-			data = $t.data("widgetData");
-
-		console.log(data);
-
-		$t.bind("widget:init", function(){
-			$t.prependTo("body");
-			setTimeout(function(){
-				$t.addClass("top-panel--initialized");
-			}, 100);
-			
-
-		}).bind("mouseenter mouseleave", function(e){
-			var $t = $(this);
-			$t[e.type == "mouseenter" ? "addClass" : "removeClass"]("top-panel--hovered");
-
-		}).click(function(e){
-			e.stopPropagation();
-			e.preventDefault();
-
-			var $t = $(this),
-				$e = $(e.target),
-				$a = $e.closest("a"),
-				action;
-
-			if ($a.size()) {
-				action = $a.data("action") || "noop";
-				if (data.controls[action] && data.controls[action].clickFn) {
-					data.controls[action].clickFn.call($t);
-				}
-			}
-		});
-	}
-
 	var widgetData = {
 			mode:"railsDev",     // "railsDev" or something else
 			name:"css-reloader",
 			controls:{
-				/*blank:{
-					className:'blank',
-					titleHov:'blank hovering text',
-					title:'B',
-					clickFn:function(){
-						console.log("nodo");
-					}
-				},*/
 				refreshCSS:{
 					className:'control css-style css-reloader',
 					titleHov:'Reload CSS',
 					title:'R',
-					clickFn:refreshCSS
+					jobFn:refreshCSS,
+					hotKey:"ctrl+alt+r"
 				},
 				doJS:{
 					className:'control js-style js-do',
 					titleHov:'Do something with window.fnCR function',
 					title:'J',
-					clickFn:execFnCR
+					jobFn:execFnCR,
+					hotKey:"ctrl+alt+j"
 				}
 			}
 		},
-		$panel = buildWidget(widgetData);
+		panelWidget = new Widget(widgetData);
 
-	bindWidget.apply($panel);
-	$panel.trigger("widget:init");
+	/*!function(){
+		var str = "Alt+Shift+R".toLowerCase(),
+			keyPresser = new KeyPresser(),
+			strKeys = keyPresser.stringToKeysArray(str);
 
-	getStylesByPartOfPath(widgetData.name);
+		console.log(strKeys);
+	}();*/
 
 }(document, window, jQuery);
