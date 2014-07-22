@@ -24,7 +24,7 @@ function splitByFilename(str) {
 
 /* KeyPresser {{{ */
 	var KeyPresser = function(combs) {
-		this.keyMap = {ENTER:13, SHIFT:16, CTRL:17, ALT:18, ESC:27, LEFT:37, RIGHT:39, UP:38, DOWN:40};
+		this.keyMap = {ENTER:13, SHIFT:16, CTRL:17, ALT:18, ESC:27, LEFT:37, UP:38, RIGHT:39, DOWN:40};
 		this.keysPressed = [];
 		this.combsListenTo = combs || [];
 		this.init.call(this, arguments);
@@ -41,6 +41,8 @@ function splitByFilename(str) {
 				t.checkForCombinationsPressed(e);
 			}).bind("keyup", function(e){
 				t.popKey(e.keyCode);
+			}).bind("blur", function(){
+				t.emptyKeys();
 			});
 		},
 		pushKey: function(a) {
@@ -70,6 +72,9 @@ function splitByFilename(str) {
 				}
 			}
 			return false;
+		},
+		emptyKeys: function() {
+			this.keysPressed = [];
 		},
 		registerCombination: function(string, callback) {
 			var comb = {
@@ -291,7 +296,7 @@ function splitByFilename(str) {
 
 	/* test for any combination event */
 	/*new KeyPresser().registerCombination("left+right", function(){
-		console.log("left + right");
+		console.log("left+right");
 	});*/
 
 }(document, window, jQuery);
