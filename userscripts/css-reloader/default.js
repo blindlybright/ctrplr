@@ -194,29 +194,31 @@ function splitByFilename(str) {
 				}
 			}
 
-			$t.bind("widget:init", function(){
-				$t.prependTo("body");
-				setTimeout(function(){
-					$t.addClass("top-panel--initialized");
-				}, 100);
+			$t.bind({
+				"widget:init":function(){
+					$t.prependTo("body");
+					setTimeout(function(){
+						$t.addClass("top-panel--initialized");
+					}, 100);
+				},
+				"mouseenter mouseleave": function(e){
+					var $t = $(this);
+					$t[e.type == "mouseenter" ? "addClass" : "removeClass"]("top-panel--hovered");
+				},
+				click: function(e){
+					e.stopPropagation();
+					e.preventDefault();
 
-			}).bind("mouseenter mouseleave", function(e){
-				var $t = $(this);
-				$t[e.type == "mouseenter" ? "addClass" : "removeClass"]("top-panel--hovered");
+					var $t = $(this),
+						$e = $(e.target),
+						$a = $e.closest("a"),
+						action;
 
-			}).click(function(e){
-				e.stopPropagation();
-				e.preventDefault();
-
-				var $t = $(this),
-					$e = $(e.target),
-					$a = $e.closest("a"),
-					action;
-
-				if ($a.size()) {
-					action = $a.data("action") || "noop";
-					if (data.controls[action] && data.controls[action].jobFn) {
-						data.controls[action].jobFn.call($t);
+					if ($a.size()) {
+						action = $a.data("action") || "noop";
+						if (data.controls[action] && data.controls[action].jobFn) {
+							data.controls[action].jobFn.call($t);
+						}
 					}
 				}
 			});
@@ -272,6 +274,21 @@ function splitByFilename(str) {
 		console.log("finished");
 		console.groupEnd();
 	}
+	function showBackground() {
+		var svgs = window.document.getElementsByTagName("svg");
+		if (svgs.length) {
+			svgs[0].style.backgroundColor = "#ff0";
+		} else {
+			var number = 4,
+				bgNumber = $("body").data("bgNumber");
+			if (bgNumber === undefined) bgNumber = -1;
+			$("body").removeClass("user-background-" + bgNumber);
+
+			bgNumber = (bgNumber+1) % number;
+			$("body").data("bgNumber", bgNumber);
+			$("body").addClass("user-background-" + bgNumber);
+		}
+	}
 	var widgetData = {
 			mode:"railsDev",     // "railsDev" or something else
 			name:"css-reloader",
@@ -282,6 +299,13 @@ function splitByFilename(str) {
 					title:'R',
 					jobFn:refreshCSS,
 					hotKey:"ctrl+alt+r"
+				},
+				showBg:{
+					className:'control image-style css-image',
+					titleHov:'Show me background',
+					title:'B',
+					jobFn:showBackground,
+					hotKey:"ctrl+alt+b"
 				},
 				doJS:{
 					className:'control js-style js-do',
@@ -299,4 +323,4 @@ function splitByFilename(str) {
 		console.log("left+right");
 	});*/
 
-}(document, window, jQuery);
+}(document, window, window.jQuery);
