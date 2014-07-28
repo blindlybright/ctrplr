@@ -1,8 +1,9 @@
 /*
- * css reloader
- * -webkit only prefixes
+ * NAME: toolbar panel
+ * AUTHOR: caterpillar, 2014+
+ * REM: -webkit only prefixes
  ****************/
-.top-panel {
+.toolbar-panel {
 	position:fixed;
 	z-index:3001;
 	top:0;
@@ -18,19 +19,19 @@
 	box-shadow:0 0 2px #000;
 	font:12px/1.2 sans-serif;
 	}
-	.top-panel:hover {
+	.toolbar-panel:hover {
 		opacity:1;
 		right:40px;
 		}
-	.top-panel a {
+	.toolbar-panel a {
 		color:#ccc;
 		text-decoration:none;
 		}
-.top-panel.top-panel--initialized {
+.toolbar-panel.toolbar-panel--initialized {
 	-webkit-transition:all .5s ease;
 	transition:all .5s ease;
 	}
-.top-panel__header {
+.toolbar-panel__header {
 	display:inline-block;
 	*display:inline;
 	*zoom:1;
@@ -39,7 +40,7 @@
 	line-height:6px;
 	font-size:10px;
 	}
-.top-panel__content {
+.toolbar-panel__content {
 	position:absolute;
 	z-index:3000;
 	top:0;
@@ -50,7 +51,7 @@
 	-webkit-box-sizing:content-box;
 	box-sizing:content-box;
 	}
-	.top-panel__content:before {
+	.toolbar-panel__content:before {
 		content:" ";
 		position:absolute;
 		top:0;
@@ -59,10 +60,10 @@
 		height:16px;
 		background:#fff;
 		}
-.top-panel:hover .top-panel__content {
+.toolbar-panel:hover .toolbar-panel__content {
 	box-shadow:0 0 2px #000;
 	}
-.control {
+.toolbar-control {
 	display:inline-block;
 	*display:inline;
 	*zoom:1;
@@ -72,42 +73,44 @@
 	text-align:center;
 	color:#ccc !important;
 	margin:0 5px 0 0;
+	background:#333;
 	-webkit-transition:all .25s ease;
 	transition:all .25s ease;
 	}
-	.control:hover {
+	.toolbar-control:hover {
 		color:#fff !important;
 	}
-.control.css-style {
+.toolbar-control.toolbar-control--cssReloader {
 	background:#080;
 	}
-	.control.css-style:hover {
+	.toolbar-control.toolbar-control--cssReloader:hover {
 		background:#0c0;
 		}
-.control.js-style {
-	background:#800;
-	}
-	.control.js-style:hover {
-		background:#c00;
-		}
-.control.image-style {
+.toolbar-control.toolbar-control--showBackground {
 	background:#888;
 	}
-	.control.image-style:hover {
+	.toolbar-control.toolbar-control--showBackground:hover {
 		background:#ccc;
 		}
-body.user-background-0 {
+.toolbar-control.toolbar-control--doJS {
+	background:#800;
+	}
+	.toolbar-control.toolbar-control--doJS:hover {
+		background:#c00;
+		}
+/* backgrounds part */
+body.toolbar-background-0 {
 	background:#000;
 }
 /* taken from http://lea.verou.me/css3patterns/ */
-body.user-background-1 {
+body.toolbar-background-1 {
 	background-color: #fff;
 	background-image: linear-gradient(45deg, #cbcbcb 25%, transparent 25%, transparent 75%, #cbcbcb 75%, #cbcbcb), 
 		linear-gradient(45deg, #cbcbcb 25%, transparent 25%, transparent 75%, #cbcbcb 75%, #cbcbcb);
 	background-size:16px 16px;
 	background-position:0 0, 8px 8px;
 }
-body.user-background-2 {
+body.toolbar-background-2 {
 	background-color: #026873;
 	background-image: linear-gradient(90deg, rgba(255,255,255,.07) 50%, transparent 50%),
 		linear-gradient(90deg, rgba(255,255,255,.13) 50%, transparent 50%),

@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name       CSS Reloader
-// @namespace  http://stylesheats.reloader.caterpillar/
+// @name       Toolbar
+// @namespace  http://toolbar.caterpillar/
 // @version    0.1
-// @description  stylesheats reloader
+// @description  my pane
 // @include    /^https?://.*$/
 // @include    /^https?://another\.host.*/
 // @copyright  2014+, caterpillar
@@ -11,12 +11,12 @@
 (function(window, undefined){
 	var protocol = window.location.protocol,
 		opts = {
-			name:"executing",
-			info:"CSS Reloader",
+			name:"toolbar",
+			info:"Tool Bar",
 			urls:["^https?://.*$", "^https?://another\.host.*"],  // urls must be a set of regexps, duplicating @include notations in ==Userscript== section above
 			jQueryUrl:protocol + '//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js',
-			scriptToLoad:protocol + '//ctrplr.caterpillar/userscripts/css-reloader/default.js'
-			// scriptToLoad:'https://raw.githubusercontent.com/blindlybright/github.io/master/userscripts/css-reloader/default.js'
+			scriptToLoad:protocol + '//ctrplr.caterpillar/userscripts/toolbar/default.js'      // local version
+			//scriptToLoad:protocol + '//raw.githubusercontent.com/blindlybright/github.io/master/userscripts/css-reloader/default.js'
 		}, w, i, isAppended = false;
 
 	if (window.unsafeWindow !== undefined) {
@@ -28,7 +28,6 @@
 		return;
 	}
 
-	//console.log(opts.name + ": " + opts.info);
 	function doWithJQuery($) {
 		$("<script src='" + opts.scriptToLoad + "'></script>").appendTo($("body"));
 	}

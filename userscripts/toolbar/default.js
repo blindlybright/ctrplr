@@ -3,8 +3,11 @@
 function splitByFilename(str) {
 	var arr = str.split("/"),
 		filename = arr.pop(),
+		ext,
 		gets = filename.split("?"),
-		getObj = {}, _get, i;
+		getObj = {},
+		_get,
+		i;
 
 	filename = gets[0];
 	gets = gets.length > 1 ? gets[1] : undef;
@@ -15,9 +18,16 @@ function splitByFilename(str) {
 			getObj[_get[0]] = _get[1];
 		}
 	}
+	ext = filename.split(".");//[1] || "";
+	if (ext.length <= 1) {
+		ext = "";
+	} else {
+		ext = ext[ext.length - 1];
+	}
 	return {
 		path:arr.join("/")+"/",
 		filename:filename,
+		ext:ext,
 		gets:getObj
 	};
 }
@@ -134,12 +144,15 @@ function splitByFilename(str) {
 			this.widgetData = widgetData || {};
 			this.widgetData.controls = widgetData.controls || {};
 			this.widgetData.name = widgetData.name || "noname";
+			this.path;
 
-			this.getStylesByPartOfPath(widgetData.name);
+			this.getPath(widgetData.name);
+			this.getStylesByPartOfPath();
 
 			this.buildWidget().bindWidget().startWidget();
 		},
-		getStylesByPartOfPath: function(strmatch) {
+		getPath: function(strmatch){
+			if (strmatch === undefined) return this.path;
 			var script = "",
 				splitted;
 
@@ -152,20 +165,24 @@ function splitByFilename(str) {
 			});
 			splitted = splitByFilename(script);
 
-			$("head").append("<link href='" + splitted['path'] + "default.css' rel='stylesheet' type='text/css' />");
+			this.path = splitted['path'];
+			return this.path;
+		},
+		getStylesByPartOfPath: function() {
+			$("head").append("<link href='" + this.path + "default.css' rel='stylesheet' type='text/css' />");
 		},
 		buildWidget: function() {
 			var data = this.widgetData,
 				controls = data.controls || {},
 				key, value,
-				$panel = $("<div class='top-panel'></div>"),
-				html = ["<span class='top-panel__header'>My pane</span>"];
+				$panel = $("<div class='toolbar-panel'></div>"),
+				html = ["<span class='toolbar-panel__header'>Toolbar</span>"];
 
-			html.push("<span class='top-panel__content'>");
+			html.push("<span class='toolbar-panel__content'>");
 			for (key in controls) {
 				if (key === 'length' || !controls.hasOwnProperty(key)) continue;
 				value = controls[key];
-				html.push("<a href='#" + key + "' class='" + value.className + "' title='" + value.titleHov + "' data-action='" + key + "'>" + value.title + "</a>");
+				html.push("<a href='#" + key + "' class='toolbar-control toolbar-control--" + key + "' title='" + value.titleAlt + "' data-action='" + key + "'>" + value.title + "</a>");
 			}
 			html.push("</span>");
 
@@ -195,17 +212,17 @@ function splitByFilename(str) {
 			}
 
 			$t.bind({
-				"widget:init":function(){
+				"init.widget":function(){
 					$t.prependTo("body");
 					setTimeout(function(){
-						$t.addClass("top-panel--initialized");
+						$t.addClass("toolbar-panel--initialized");
 					}, 100);
 				},
-				"mouseenter mouseleave": function(e){
+				"mouseenter.widget mouseleave.widget": function(e){
 					var $t = $(this);
-					$t[e.type == "mouseenter" ? "addClass" : "removeClass"]("top-panel--hovered");
+					$t[e.type == "mouseenter" ? "addClass" : "removeClass"]("toolbar-panel--hovered");
 				},
-				click: function(e){
+				"click.widget": function(e){
 					e.stopPropagation();
 					e.preventDefault();
 
@@ -225,7 +242,7 @@ function splitByFilename(str) {
 			return this;
 		},
 		startWidget: function() {
-			this.$panel.trigger("widget:init");
+			this.$panel.trigger("init.widget");
 		}
 	}
 /* }}} Widget */
@@ -243,11 +260,11 @@ function splitByFilename(str) {
 			console.log("no window.fnCR function was found");
 		}
 	}
-	function refreshCSS() {
-		var $links = $("link[rel='stylesheet']"),
+	function cssReloader() {
+		var $links = $("link[rel='stylesheet'], link[rel='stylesheet/less']"),
 			rnd = (Math.random()+"").split(".")[1]*1;
 
-		console.groupCollapsed("--- css refreshing ---");
+		console.groupCollapsed("toolbar: css refreshing");
 		console.log("starting refreshing: " + ($links.size()-1) + " stylesheats, rnd = " + rnd); // -1 is about css-reloader/default.css
 
 		$links.each(function(i){
@@ -271,45 +288,87 @@ function splitByFilename(str) {
 				$t.attr("href", splitted['path'] + splitted['filename'] + (_gets !== "" ? ("?" + _gets) : ""));
 			}
 		});
+		if ($links.filter("[rel='stylesheet/less']").size() > 0 && !less) {
+			$.getScript("//cdnjs.cloudflare.com/ajax/libs/less.js/1.7.3/less.min.js");
+		} else {
+			$("[id^=less]").remove();
+			less.refresh();
+		}
+
 		console.log("finished");
 		console.groupEnd();
 	}
 	function showBackground() {
-		var svgs = window.document.getElementsByTagName("svg");
-		if (svgs.length) {
-			svgs[0].style.backgroundColor = "#ff0";
-		} else {
+		//??? will it be ever used...
+		//var svgs = window.document.getElementsByTagName("svg");
+		//if (svgs.length) {
+		//	svgs[0].style.backgroundColor = "#ff0";
+		//} else {
 			var number = 4,
 				bgNumber = $("body").data("bgNumber");
 			if (bgNumber === undefined) bgNumber = -1;
-			$("body").removeClass("user-background-" + bgNumber);
+			$("body").removeClass("toolbar-background-" + bgNumber);
 
 			bgNumber = (bgNumber+1) % number;
 			$("body").data("bgNumber", bgNumber);
-			$("body").addClass("user-background-" + bgNumber);
-		}
+			$("body").addClass("toolbar-background-" + bgNumber);
+		//}
+	}
+	var Prism_Extensions = {
+		js:'javascript',
+		html:'markup',
+		svg:'markup',
+		xml:'markup',
+		py:'python'
+	};
+	function highlightCode() {
+		var path = panelWidget.getPath(),
+			$pres = $("body").children("pre"),
+			loc = window.location.href,
+			parts = splitByFilename(loc),
+			ext = parts.ext;
+
+		$pres.each(function(){
+			var $t = $(this),
+				html = $t.html(),
+				lang = Prism_Extensions[ext] ? Prism_Extensions[ext] : ext;
+			if ($t.children("code").size() == 0) {
+				$t.html("<code class='language-" + lang + "'>" + html + "</code>");
+			}
+			//console.log("<code class='code-" + map[ext] + "'>" + html + "</code>");
+		});
+
+		$("head").append('<link rel="stylesheet" href="//cdn.jsdelivr.net/prism/0.1/prism.css" />');
+		//cdn.jsdelivr.net/prism/0.1/plugins/autolinker/index.html
+		$.getScript('//cdn.jsdelivr.net/prism/0.1/prism.full.min.js', function(){
+			Prism.highlightAll();
+		});
+		//$("head").append('<script type="javascript" src="' + path + 'prism/prism.js"></script>');
 	}
 	var widgetData = {
 			mode:"railsDev",     // "railsDev" or something else
-			name:"css-reloader",
+			name:"toolbar",
 			controls:{
-				refreshCSS:{
-					className:'control css-style css-reloader',
-					titleHov:'Reload CSS',
+				cssReloader:{
+					titleAlt:'Reload CSS',
 					title:'R',
-					jobFn:refreshCSS,
+					jobFn:cssReloader,
 					hotKey:"ctrl+alt+r"
 				},
-				showBg:{
-					className:'control image-style css-image',
-					titleHov:'Show me background',
+				showBackground:{
+					titleAlt:'Show me another background',
 					title:'B',
 					jobFn:showBackground,
 					hotKey:"ctrl+alt+b"
 				},
+				highlightCode:{
+					titleAlt:'Highlight code',
+					title:'H',
+					jobFn:highlightCode,
+					hotKey:"ctrl+alt+h"
+				},
 				doJS:{
-					className:'control js-style js-do',
-					titleHov:'Do something with window.fnCR function',
+					titleAlt:'Do something with window.fnCR function',
 					title:'J',
 					jobFn:execFnCR,
 					hotKey:"ctrl+alt+j"
