@@ -339,7 +339,6 @@ function splitByFilename(str) {
 		});
 
 		$("head").append('<link rel="stylesheet" href="//cdn.jsdelivr.net/prism/0.1/prism.css" />');
-		//cdn.jsdelivr.net/prism/0.1/plugins/autolinker/index.html
 		$.getScript('//cdn.jsdelivr.net/prism/0.1/prism.full.min.js', function(){
 			Prism.highlightAll();
 		});
