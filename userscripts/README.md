@@ -10,5 +10,7 @@
 5. **refresh** your target page (note "Toolbar" in top right corner);
 6. **profit!!!** ^__~
 
-CSS Refresher was created while working with heavy projects by their server side.
-Script is reducing server load with refreshing only stylesheets.
+This toolbar was created while working with heavy projects by their server side.  
+It began as just a css refreshing script which is reducing server load while refreshing only stylesheets (ctrl+alt+r).  
+Now it's also highlight js, css files with Prismjs by Lea Verou (ctrl+alt+h).  
+And it can also change background color. For example, to see white-on-transparent png images (ctrl+alt+b).  
