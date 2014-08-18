@@ -98,6 +98,18 @@
 	.toolbar-control.toolbar-control--doJS:hover {
 		background:#c00;
 		}
+.toolbar-control.toolbar-control--translate {
+	background:#880;
+	}
+	.toolbar-control.toolbar-control--translate:hover {
+		background:#cc0;
+		}
+.toolbar-control.toolbar-control--highlightCode {
+	background:#088;
+	}
+	.toolbar-control.toolbar-control--highlightCode:hover {
+		background:#0cc;
+		}
 /* backgrounds part */
 body.toolbar-background-0 {
 	background:#000;

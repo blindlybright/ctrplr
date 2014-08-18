@@ -169,7 +169,11 @@ function splitByFilename(str) {
 			return this.path;
 		},
 		getStylesByPartOfPath: function() {
-			$("head").append("<link href='" + this.path + "default.css' rel='stylesheet' type='text/css' />");
+			var $c = $("head");
+			if ($c.size() == 0) {
+				$c = $("body");
+			}
+			$c.append("<link href='" + this.path + "default.css' rel='stylesheet' type='text/css' />");
 		},
 		buildWidget: function() {
 			var data = this.widgetData,
@@ -288,13 +292,14 @@ function splitByFilename(str) {
 				$t.attr("href", splitted['path'] + splitted['filename'] + (_gets !== "" ? ("?" + _gets) : ""));
 			}
 		});
-		if ($links.filter("[rel='stylesheet/less']").size() > 0 && !less) {
-			$.getScript("//cdnjs.cloudflare.com/ajax/libs/less.js/1.7.3/less.min.js");
-		} else {
-			$("[id^=less]").remove();
-			less.refresh();
+		if ($links.filter("[rel='stylesheet/less']").size() > 0) {
+			if (!less) {
+				$.getScript("//cdnjs.cloudflare.com/ajax/libs/less.js/1.7.3/less.min.js");
+			} else {
+				$("[id^=less]").remove();
+				less.refresh();
+			}
 		}
-
 		console.log("finished");
 		console.groupEnd();
 	}
@@ -344,6 +349,40 @@ function splitByFilename(str) {
 		});
 		//$("head").append('<script type="javascript" src="' + path + 'prism/prism.js"></script>');
 	}
+	
+	function getSelectionText() {
+		var txt = '';
+		if (txt = window.getSelection) // Not IE, используем метод getSelection
+			txt = window.getSelection().toString();
+		else // IE, используем объект selection
+			txt = document.selection.createRange().text;
+		return txt;
+	}
+	function translateSelection() {
+		var text = getSelectionText(),
+			key = "";
+		if (toolBarOpts !== undefined) {
+			key = toolBarOpts.keys.yTranslate
+		}
+		if (!key) {
+			console.error("no yandex key");
+		} else {
+			if (text) {
+				$.post("https://translate.yandex.net/api/v1.5/tr.json/translate",
+					{
+						key: key,
+						text: text,
+						lang: "ru",
+						format: "text",
+					},
+					function(response, status, xhr) {
+						console.log(text + " [" + response.lang + "]: " + response.text.join(", "));
+					},
+					"json"
+				);
+			}
+		}
+	}
 	var widgetData = {
 			mode:"railsDev",     // "railsDev" or something else
 			name:"toolbar",
@@ -365,6 +404,12 @@ function splitByFilename(str) {
 					title:'H',
 					jobFn:highlightCode,
 					hotKey:"ctrl+alt+h"
+				},
+				translate:{
+					titleAlt:'Translate selection',
+					title:'T',
+					jobFn:translateSelection,
+					hotKey:"ctrl+alt+t"
 				},
 				doJS:{
 					titleAlt:'Do something with window.fnCR function',
